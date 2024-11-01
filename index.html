@@ -3,7 +3,7 @@
 <head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Gotu&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -32,6 +32,17 @@
       to { border-right-color: transparent }
     }
 
+    @keyframes expandSearch {
+      from {
+        transform: scale(1);
+        background: white;
+      }
+      to {
+        transform: scale(1);
+        background: #fff7ed;
+      }
+    }
+
     body {
       min-height: 100vh;
       background-color: #fff7ed;
@@ -41,6 +52,12 @@
       align-items: center;
       justify-content: center;
       padding: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    body.search-active {
+      padding-top: 0;
+      justify-content: flex-start;
     }
 
     .card {
@@ -50,29 +67,63 @@
       border-radius: 0.75rem;
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       animation: fadeIn 0.8s ease-out;
+      transition: all 0.5s ease;
+    }
+
+    .card.expanded {
+      max-width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      border-radius: 0;
+      animation: expandSearch 0.5s ease-out;
     }
 
     .card-content {
       padding: 1.5rem;
+      transition: all 0.3s ease;
     }
 
     .header {
       text-align: center;
       margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .expanded .header {
+      text-align: left;
+      margin-bottom: 1rem;
     }
 
     .title {
-      font-size: 2.25rem;
-      font-weight: 600;
+      font-size: 3.5rem;
+      font-weight: 700;
       color: #1f2937;
       margin-bottom: 0.5rem;
-      font-family: 'Gotu', serif;
+      transition: all 0.3s ease;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .title .highlight {
+      color: #f97316;
+      position: relative;
+      display: inline-block;
+    }
+
+    .expanded .title {
+      font-size: 2rem;
     }
 
     .subtitle-container {
       overflow: hidden;
       margin: 0 auto;
       max-width: fit-content;
+      transition: all 0.3s ease;
+    }
+
+    .expanded .subtitle-container {
+      display: none;
     }
 
     .subtitle {
@@ -87,12 +138,24 @@
         blinkCursor 0.75s step-end infinite;
     }
 
-    /* Search suggestions */
+    .search-container {
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.8s ease-out 1.5s both;
+    }
+
+    .expanded .search-container {
+      position: sticky;
+      top: 0;
+      background: white;
+      padding: 1rem 0;
+      margin: 0;
+      z-index: 100;
+    }
+
     .suggestions {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 0.5rem;
-      margin-bottom: 1.5rem;
       animation: fadeIn 0.8s ease-out 1s both;
     }
 
@@ -117,16 +180,7 @@
       color: #f97316;
     }
 
-    .sanskrit {
-      font-family: 'Gotu', serif;
-      color: #f97316;
-    }
-
-    /* CSE Customization */
-    .search-container {
-      animation: fadeIn 0.8s ease-out 1.5s both;
-    }
-
+    /* Google CSE Customization */
     .search-container .gsc-control-cse {
       padding: 0 !important;
       border: none !important;
@@ -194,45 +248,13 @@
       color: #ea580c !important;
     }
 
-    .search-container .gs-snippet {
-      color: #4b5563 !important;
-      font-size: 0.875rem !important;
-      line-height: 1.5 !important;
-      font-family: 'Inter', sans-serif !important;
-    }
-
-    .search-container .gsc-cursor-box {
-      margin-top: 1rem !important;
-    }
-
-    .search-container .gsc-cursor-page {
-      padding: 0.5rem 0.75rem !important;
-      margin: 0 0.25rem !important;
-      border: 1px solid #e5e7eb !important;
-      border-radius: 0.375rem !important;
-      color: #374151 !important;
-    }
-
-    .search-container .gsc-cursor-page:hover {
-      border-color: #f97316 !important;
-      background: #fff7ed !important;
-      color: #f97316 !important;
-    }
-
-    .search-container .gsc-cursor-current-page {
-      background: #f97316 !important;
-      color: white !important;
-      border-color: #f97316 !important;
-    }
-
-    /* Mobile Responsiveness */
     @media (max-width: 640px) {
       .card-content {
         padding: 1rem;
       }
 
       .title {
-        font-size: 1.75rem;
+        font-size: 2.5rem;
       }
 
       .subtitle {
@@ -242,6 +264,10 @@
       .suggestions {
         grid-template-columns: 1fr;
       }
+
+      .expanded .title {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
@@ -249,23 +275,23 @@
   <div class="card">
     <div class="card-content">
       <div class="header">
-        <h1 class="title"><span class="sanskrit">सत साहेब</span></h1>
+        <h1 class="title"><span class="highlight">Sat</span> Saheb</h1>
         <div class="subtitle-container">
           <p class="subtitle">What do you want to search today?</p>
         </div>
       </div>
       
-      <div class="suggestions">
-        <button class="suggestion-btn"><span class="sanskrit">गीता</span> Gyan data</button>
-        <button class="suggestion-btn">Download books</button>
-        <button class="suggestion-btn"><span class="sanskrit">सतलोक</span></button>
-        <button class="suggestion-btn">Sant Rampal Ji teachings</button>
-      </div>
-
       <div class="search-container">
         <script async src="https://cse.google.com/cse.js?cx=21a40aa1cde894e55">
         </script>
         <div class="gcse-search"></div>
+      </div>
+
+      <div class="suggestions">
+        <button class="suggestion-btn">Geeta Knowledge</button>
+        <button class="suggestion-btn">Download Books</button>
+        <button class="suggestion-btn">Satlok</button>
+        <button class="suggestion-btn">Sant Rampal Ji Teachings</button>
       </div>
     </div>
   </div>
@@ -273,6 +299,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const suggestions = document.querySelectorAll('.suggestion-btn');
+      const card = document.querySelector('.card');
+      const body = document.body;
       
       suggestions.forEach(button => {
         button.addEventListener('click', function() {
@@ -286,6 +314,40 @@
           }, 100);
         });
       });
+
+      // Watch for search button clicks and search results
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.target.classList.contains('gsc-results-wrapper-visible')) {
+            card.classList.add('expanded');
+            body.classList.add('search-active');
+          }
+        });
+      });
+
+      // Start observing once the search element is loaded
+      const waitForSearch = setInterval(() => {
+        const searchResults = document.querySelector('.gsc-results-wrapper-overlay');
+        if (searchResults) {
+          observer.observe(searchResults, {
+            attributes: true,
+            attributeFilter: ['class']
+          });
+          clearInterval(waitForSearch);
+        }
+      }, 100);
+
+      // Also trigger expansion when search button is clicked
+      const waitForSearchButton = setInterval(() => {
+        const searchButton = document.querySelector('.gsc-search-button');
+        if (searchButton) {
+          searchButton.addEventListener('click', () => {
+            card.classList.add('expanded');
+            body.classList.add('search-active');
+          });
+          clearInterval(waitForSearchButton);
+        }
+      }, 100);
     });
   </script>
 </body>
