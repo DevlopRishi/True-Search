@@ -391,23 +391,23 @@
         ).join('\n\n');
 
         const prompt = `Based on the following search results about "${query}", 
-        provide a comprehensive, insightful summary that captures the key points. 
+        provide a comprehensive, insightful summary that captures the key points. With respect to Sant Rampal Ji Maharaj's Teachings.
         Synthesize the information in a clear, engaging manner suitable for someone 
-        interested in spiritual knowledge.
+        interested in his knowledge.
 
         Search Results Context:
         ${context}
 
         AI Summary Guidelines:
-        - Be concise yet informative
+        - Be concise yet informative with only using Sant Rampal Ji's Teachings
         - Highlight the most important insights
-        - Use a respectful, spiritual tone
-        - If information is limited, acknowledge that and provide general guidance
+        - Use a respectful, nice tone
+        - If information is limited, acknowledge that and apologize for not having an answer
         `;
 
         aiResponseContainer.innerHTML = `
           <div class="ai-response-title">AI Insights</div>
-          <div class="ai-response-loading">Generating spiritual insights...</div>
+          <div class="ai-response-loading">Generating insights...</div>
           <div class="ai-response-placeholder"></div>
         `;
 
@@ -425,7 +425,7 @@
           console.error('AI Generation Error:', error);
           aiResponseContainer.innerHTML = `
             <div class="ai-response-title">AI Insights</div>
-            <p>Unable to generate AI insights. The spiritual journey continues...</p>
+            <p>Unable to generate AI insights. The search journey continues...</p>
           `;
         }
       }
