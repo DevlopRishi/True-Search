@@ -236,6 +236,37 @@
       .suggestions {
         grid-template-columns: 1fr;
       }
+.ai-response-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-color);
+      font-style: italic;
+      padding: 1rem;
+    }
+
+    .ai-response-loading::before {
+      content: '✧';
+      margin-right: 0.5rem;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    .ai-response-placeholder {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite linear;
+      height: 100px;
+      border-radius: 0.5rem;
     }
   </style>
 </head>
@@ -268,7 +299,8 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+document.addEventListener('DOMContentLoaded', function() {
       const card = document.querySelector('.card');
       const searchInput = document.querySelector('.search-input');
       const searchButton = document.querySelector('.search-button');
@@ -347,6 +379,64 @@
         });
       });
     });
+const API_KEY = 'AIzaSyCn8TTou_k7ypS-_boymPM4SSLeZONUgog'; // Replace with your actual Gemini API key
+      const genAI = new GoogleGenerativeAI(API_KEY);
+
+      async function generateAIResponse(query, searchResults) {
+        // Prepare context from search results
+        const context = searchResults.map(result => 
+          `Title: ${result.title}\nSnippet: ${result.snippet}`
+        ).join('\n\n');
+
+        const prompt = `Based on the following search results about "${query}", 
+        provide a comprehensive, insightful summary that captures the key points. 
+        Synthesize the information in a clear, engaging manner suitable for someone 
+        interested in spiritual knowledge.
+
+        Search Results Context:
+        ${context}
+
+        AI Summary Guidelines:
+        - Be concise yet informative
+        - Highlight the most important insights
+        - Use a respectful, spiritual tone
+        - If information is limited, acknowledge that and provide general guidance
+        `;
+
+        aiResponseContainer.innerHTML = `
+          <div class="ai-response-title">AI Insights</div>
+          <div class="ai-response-loading">Generating spiritual insights...</div>
+          <div class="ai-response-placeholder"></div>
+        `;
+
+        try {
+          const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+          const result = await model.generateContent(prompt);
+          const response = await result.response;
+          const text = response.text();
+
+          aiResponseContainer.innerHTML = `
+            <div class="ai-response-title">AI Insights</div>
+            <p>${text}</p>
+          `;
+        } catch (error) {
+          console.error('AI Generation Error:', error);
+          aiResponseContainer.innerHTML = `
+            <div class="ai-response-title">AI Insights</div>
+            <p>Unable to generate AI insights. The spiritual journey continues...</p>
+          `;
+        }
+      }
+
+      // [Rest of the previous JavaScript remains the same]
+    });
+  </script>
+  <script type="importmap">
+  {
+    "imports": {
+      "@google/generative-ai": "https://esm.run/@google/generative-ai"
+    }
+  }
   </script>
 </body>
 </html>
