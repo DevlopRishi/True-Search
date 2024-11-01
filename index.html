@@ -279,7 +279,7 @@
           <p class="subtitle">What do you want to search today?</p>
         </div>
       </div>
-      
+
       <div class="search-container">
         <div class="search-box">
           <input type="text" class="search-input" placeholder="Search for spiritual knowledge...">
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const searchButton = document.querySelector('.search-button');
       const suggestions = document.querySelectorAll('.suggestion-btn');
       const searchResults = document.querySelector('.search-results');
-      
+
       // Define the sites to search
       const sites = [
         'www.satsaheb.org',
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       function displayResults(results) {
         searchResults.innerHTML = '';
-        
+
         if (results.length === 0) {
           searchResults.innerHTML = '<p>No results found.</p>';
           return;
@@ -427,8 +427,6 @@ const API_KEY = 'AIzaSyCn8TTou_k7ypS-_boymPM4SSLeZONUgog'; // Replace with your 
           `;
         }
       }
-
-      // [Rest of the previous JavaScript remains the same]
     });
   </script>
   <script type="importmap">
