@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sat Saheb Search</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
@@ -179,6 +182,53 @@
       display: block;
     }
 
+    .ai-response {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: #f9fafb;
+      border-radius: 0.5rem;
+    }
+
+    .ai-response-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f97316;
+      margin-bottom: 1rem;
+    }
+
+    .ai-response-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f97316;
+      font-style: italic;
+      padding: 1rem;
+    }
+
+    .ai-response-loading::before {
+      content: '✧';
+      margin-right: 0.5rem;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    .ai-response-placeholder {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite linear;
+      height: 100px;
+      border-radius: 0.5rem;
+    }
+
     .result-item {
       padding: 1rem;
       border: 1px solid #e5e7eb;
@@ -236,37 +286,6 @@
       .suggestions {
         grid-template-columns: 1fr;
       }
-.ai-response-loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-color);
-      font-style: italic;
-      padding: 1rem;
-    }
-
-    .ai-response-loading::before {
-      content: '✧';
-      margin-right: 0.5rem;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
-    }
-
-    @keyframes shimmer {
-      0% { background-position: -1000px 0; }
-      100% { background-position: 1000px 0; }
-    }
-
-    .ai-response-placeholder {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 1000px 100%;
-      animation: shimmer 2s infinite linear;
-      height: 100px;
-      border-radius: 0.5rem;
     }
   </style>
 </head>
@@ -295,17 +314,20 @@
       </div>
 
       <div class="search-results"></div>
+      <div class="ai-response"></div>
     </div>
   </div>
 
-  <script>
+  <script type="module">
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-document.addEventListener('DOMContentLoaded', function() {
+
+    document.addEventListener('DOMContentLoaded', function() {
       const card = document.querySelector('.card');
       const searchInput = document.querySelector('.search-input');
       const searchButton = document.querySelector('.search-button');
       const suggestions = document.querySelectorAll('.suggestion-btn');
       const searchResults = document.querySelector('.search-results');
+      const aiResponseContainer = document.querySelector('.ai-response');
 
       // Define the sites to search
       const sites = [
@@ -325,7 +347,13 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
           const response = await fetch(url);
           const data = await response.json();
-          displayResults(data.items || []);
+          const results = data.items || [];
+          displayResults(results);
+          
+          // Generate AI response after search results
+          if (results.length > 0) {
+            generateAIResponse(query, results);
+          }
         } catch (error) {
           console.error('Search error:', error);
           searchResults.innerHTML = '<p>An error occurred while searching. Please try again.</p>';
@@ -352,37 +380,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
 
-      // Event listeners
-      searchButton.addEventListener('click', () => {
-        const query = searchInput.value.trim();
-        if (query) {
-          card.classList.add('expanded');
-          performSearch(query);
-        }
-      });
-
-      searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          const query = searchInput.value.trim();
-          if (query) {
-            card.classList.add('expanded');
-            performSearch(query);
-          }
-        }
-      });
-
-      suggestions.forEach(button => {
-        button.addEventListener('click', () => {
-          searchInput.value = button.textContent;
-          card.classList.add('expanded');
-          performSearch(button.textContent);
-        });
-      });
-    });
-const API_KEY = 'AIzaSyCn8TTou_k7ypS-_boymPM4SSLeZONUgog'; // Replace with your actual Gemini API key
-      const genAI = new GoogleGenerativeAI(API_KEY);
-
+      // AI Response Generation
       async function generateAIResponse(query, searchResults) {
+        const API_KEY = 'AIzaSyCn8TTou_k7ypS-_boymPM4SSLeZONUgog';
+        const genAI = new GoogleGenerativeAI(API_KEY);
+
         // Prepare context from search results
         const context = searchResults.map(result => 
           `Title: ${result.title}\nSnippet: ${result.snippet}`
@@ -427,14 +429,34 @@ const API_KEY = 'AIzaSyCn8TTou_k7ypS-_boymPM4SSLeZONUgog'; // Replace with your 
           `;
         }
       }
+
+      // Event listeners
+      searchButton.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        if (query) {
+          card.classList.add('expanded');
+          performSearch(query);
+        }
+      });
+
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const query = searchInput.value.trim();
+          if (query) {
+            card.classList.add('expanded');
+            performSearch(query);
+          }
+        }
+      });
+
+      suggestions.forEach(button => {
+        button.addEventListener('click', () => {
+          searchInput.value = button.textContent;
+          card.classList.add('expanded');
+          performSearch(button.textContent);
+        });
+      });
     });
-  </script>
-  <script type="importmap">
-  {
-    "imports": {
-      "@google/generative-ai": "https://esm.run/@google/generative-ai"
-    }
-  }
   </script>
 </body>
 </html>
